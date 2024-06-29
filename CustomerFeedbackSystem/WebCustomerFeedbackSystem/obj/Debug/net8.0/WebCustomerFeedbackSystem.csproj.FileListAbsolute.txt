@@ -136,3 +136,4 @@ C:\Rapidbootcamp\ProjectIndividu\CustomerFeedbackSystem\WebCustomerFeedbackSyste
 C:\Rapidbootcamp\ProjectIndividu\CustomerFeedbackSystem\WebCustomerFeedbackSystem\obj\Debug\net8.0\WebCustomerFeedbackSystem.genruntimeconfig.cache
 C:\Rapidbootcamp\ProjectIndividu\CustomerFeedbackSystem\WebCustomerFeedbackSystem\obj\Debug\net8.0\ref\WebCustomerFeedbackSystem.dll
 C:\Rapidbootcamp\ProjectIndividu\CustomerFeedbackSystem\WebCustomerFeedbackSystem\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Rapidbootcamp\ProjectIndividu\CustomerFeedbackSystem\WebCustomerFeedbackSystem\obj\Debug\net8.0\WebCustomerFeedbackSystem.sourcelink.json

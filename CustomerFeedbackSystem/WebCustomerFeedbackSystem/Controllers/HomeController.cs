@@ -28,10 +28,11 @@ namespace WebCustomerFeedbackSystem.Controllers
 
         [HttpPost]
 
-        public IActionResult ReviewFeedback(int id)
+        public async Task<IActionResult> ReviewFeedback(int id)
         {
             try
             {
+                var client = _clientFactory.CreateClient();
                 var feedback = _context.Feedbacks.FirstOrDefault(f => f.FeedbackId == id);
                 if (feedback == null)
                 {
@@ -41,49 +42,24 @@ namespace WebCustomerFeedbackSystem.Controllers
 
                 feedback.Status = "Reviewed";
 
-                // Manual update query
-                _context.Database.ExecuteSqlRaw("UPDATE Feedback SET Status = {0} WHERE FeedbackId = {1}", feedback.Status, feedback.FeedbackId);
+                var content = new StringContent(JsonConvert.SerializeObject(feedback), Encoding.UTF8, "application/json");
+                var response = await client.PutAsync($"https://localhost:7009/api/Feedback/{id}", content);
 
-                return Ok();
+                if (response.IsSuccessStatusCode)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogError($"Failed to update feedback with id {id}. Status code: {response.StatusCode}");
+                    return StatusCode((int)response.StatusCode, "Error updating feedback status");
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while updating feedback status.");
                 return StatusCode(500, "Internal server error");
             }
-
-            //Versi API;
-            //try
-            //{
-            //    var client = _clientFactory.CreateClient();
-            //    var feedBack = new Feedback
-            //    {
-            //        Status = fb.Status,
-            //        FeedbackId = fb.FeedbackId,
-            //        FeedbackText = fb.FeedbackText,
-            //        CustomerId = fb.CustomerId,
-            //    };
-            //    var json = JsonConvert.SerializeObject(feedBack);
-            //    var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-            //    var response = await client.PostAsync("https://localhost:7009/api/Feedback/", content);
-
-            //    if (response.IsSuccessStatusCode)
-            //    {
-            //        TempData["SuccessMessage"] = "Transaction created successfully.";
-            //    }
-            //    else
-            //    {
-            //        TempData["ErrorMessage"] = "Failed to create transaction.";
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError(ex, "Error creating transaction");
-            //    TempData["ErrorMessage"] = "An error occurred while creating transaction.";
-            //}
-
-            //return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Index()
@@ -94,11 +70,11 @@ namespace WebCustomerFeedbackSystem.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                var transactions = JsonConvert.DeserializeObject<List<Feedback>>(json);
-                // Ambil data produk untuk dropdown
-                var products = _feedback.GetAll();
-                ViewBag.feed = products;
-                return View(transactions);
+                var fb = JsonConvert.DeserializeObject<List<Feedback>>(json);
+
+                var feedbacks = _feedback.GetAll();
+                ViewBag.feed = feedbacks;
+                return View(fb);
             }
             else
             {
